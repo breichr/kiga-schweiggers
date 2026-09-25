@@ -1,0 +1,194 @@
+{
+    "allgemein": {
+        "hinweis": "",
+        "name": "Kindergarten Schweiggers",
+        "untertitel": "NÖ Landeskindergarten mit vier Gruppen und Tagesbetreuung",
+        "willkommen": "Herzlich willkommen! Bei uns spielen, lachen und lernen Kinder von 2,5 bis 6 Jahren in vier Familiengruppen – mitten in Schweiggers, am Schulberg.",
+        "titelbild": "",
+        "adresse": "Am Schulberg 3\n3931 Schweiggers",
+        "telefon": "02829 82 73",
+        "email": "kindergarten@schweiggers.gv.at"
+    },
+    "aktuelles": {
+        "beitraege": [
+            {
+                "datum": "2026-09-24",
+                "titel": "Unsere neue Website",
+                "text": "Schön, dass Sie vorbeischauen! Hier finden Sie ab sofort Neuigkeiten, Termine und alle wichtigen Infos rund um unseren Kindergarten – auch bequem am Handy.",
+                "bild": ""
+            },
+            {
+                "datum": "2026-05-04",
+                "titel": "50 Jahre Landeskindergarten Schweiggers",
+                "text": "Am 4. Mai 2026 haben wir gemeinsam mit Kindern, Eltern und Gästen das 50-jährige Bestehen unseres Landeskindergartens gefeiert. Danke an alle, die diesen Ort über fünf Jahrzehnte mitgestaltet haben!",
+                "bild": ""
+            }
+        ]
+    },
+    "termine": {
+        "eintraege": []
+    },
+    "zeiten": {
+        "oeffnungszeiten": "**Montag bis Freitag: 07:00 – 16:00 Uhr**",
+        "betreuung": "Nachmittagsbetreuung täglich von 13:00 bis 16:00 Uhr (kostenpflichtig).\nFrühbetreuung vor 07:00 Uhr möglich (kostenpflichtig).\n\nMittagessen: Anmeldung ist täglich möglich.",
+        "tarife": [
+            {
+                "bezeichnung": "Frühbetreuung vor 07:00 Uhr",
+                "preis": "€ 20,–"
+            },
+            {
+                "bezeichnung": "Nachmittag, bis 20 Stunden im Monat",
+                "preis": "€ 52,–"
+            },
+            {
+                "bezeichnung": "Nachmittag, bis 40 Stunden im Monat",
+                "preis": "€ 72,–"
+            },
+            {
+                "bezeichnung": "Nachmittag, bis 60 Stunden im Monat",
+                "preis": "€ 97,–"
+            },
+            {
+                "bezeichnung": "Nachmittag, ab 60 Stunden im Monat",
+                "preis": "€ 112,–"
+            }
+        ]
+    },
+    "konzept": {
+        "einleitung": "In unserem Haus gibt es vier Familiengruppen mit Kindern von 2,5 bis 6 Jahren. Uns ist wichtig, dass sich jedes Kind wohl und geborgen fühlt.",
+        "text": "Jedes Kind ist einzigartig. Mit unseren pädagogischen Angeboten und Impulsen unterstützen wir seine Begabungen, Fähigkeiten und Stärken und begleiten es in seiner Entwicklung. Grundlage ist der Bildungsplan der NÖ Kindergärten – immer mit Blick auf die Bedürfnisse und das eigene Tempo jedes Kindes.\n\n**Portfolio:** Jedes Kind hat eine eigene Mappe. Darin halten wir Begabungen, Interessen und Entwicklungsschritte fest.\n\n**Zusammenarbeit mit den Eltern:** Zum Wohl der Kinder arbeiten wir eng mit den Familien zusammen und laden Eltern zu unseren Portfoliotagen ein.",
+        "zitate": [
+            {
+                "zitat": "Die große Kunst ist, den Kindern alles, was sie tun oder lernen wollen, zum Spiel zu machen.",
+                "autor": "John Locke"
+            },
+            {
+                "zitat": "Ich darf sein, der ich bin, und werden, der ich sein kann.",
+                "autor": ""
+            }
+        ]
+    },
+    "gruppen": {
+        "einleitung": "Vier Gruppen, ein Haus – und jedes Kind hat seinen Platz.",
+        "teamfoto": "",
+        "gruppen": [
+            {
+                "name": "Sonnengruppe",
+                "symbol": "sonne",
+                "farbe": "gelb",
+                "personen": "Jennifer Strondl – Elementarpädagogin\nNicole Kaufmann – Kinderbetreuerin\nMonika Weber – Kinderbetreuerin"
+            },
+            {
+                "name": "Regenbogengruppe",
+                "symbol": "regenbogen",
+                "farbe": "blau",
+                "personen": "Astrid Jeschko – Elementarpädagogin\nVerena Schmid – Kinderbetreuerin\nAnita Weixelbaum – Stützkraft"
+            },
+            {
+                "name": "Schmetterlingsgruppe",
+                "symbol": "schmetterling",
+                "farbe": "magenta",
+                "personen": "Eva Beck – Elementarpädagogin\nBarbara Schweitzer – Kinderbetreuerin\nKarin Neumüller – Stützkraft"
+            },
+            {
+                "name": "Käfergruppe",
+                "symbol": "kaefer",
+                "farbe": "rot",
+                "personen": "Christina Müllner – Elementarpädagogin & Leitung\nSophie Kainz – Kinderbetreuerin"
+            },
+            {
+                "name": "Nachmittagsbetreuung",
+                "symbol": "mond",
+                "farbe": "gruen",
+                "personen": "Michaela Fandl – Kinderbetreuerin"
+            }
+        ]
+    },
+    "feste": {
+        "feste": "Geburtstagsfeier\nErntedank\nLaternenfest\nNikolaus\nAdvent\nVorweihnachtliche Feier\nFasching\nOstern\nFamilientag\nSchulkinderfest\nSegen",
+        "projekte": [
+            {
+                "titel": "Waldtage – Projekt Natur und Umwelt",
+                "text": "Für die Kinder im letzten Kindergartenjahr gibt es jedes Jahr ein Waldprojekt mit mehreren Waldtagen.\n\nMit Ästen bauen, auf Stämmen balancieren, im Wald picknicken, den Geräuschen lauschen: Die Natur lädt zum Entdecken mit allen Sinnen ein und lässt die Kinder eigene Spiele erfinden. Das stärkt Kreativität, Konzentration, Sprache und das Miteinander – und die Kinder lernen, verantwortungsvoll mit der Umwelt umzugehen.",
+                "bild": "",
+                "bild2": "",
+                "bild3": ""
+            },
+            {
+                "titel": "Zahngesundheit mit Apollonia",
+                "text": "Eine Aktion des Landes NÖ und der NÖ Versicherungsträger: Drei Mal im Jahr besuchen Kroko und eine Zahngesundheitserzieherin jede Gruppe. Die Kinder üben spielerisch richtiges Zähneputzen und erfahren viel über gesunde Ernährung, wie Karies entsteht und was beim Zahnarzt passiert.",
+                "bild": "",
+                "bild2": "",
+                "bild3": ""
+            }
+        ]
+    },
+    "geschichte": {
+        "einleitung": "Schon 1896 gab es in Schweiggers einen Kindergarten. Das heutige Haus am Schulberg wurde 1976 eröffnet und seitdem mehrmals erweitert.",
+        "eintraege": [
+            {
+                "jahr": "1896",
+                "titel": "Der erste Kindergarten",
+                "text": "Oberlehrer J. Mauritz gründet im Mai einen Kindergarten in Schweiggers. Das Geld dafür sammelt er unter anderem mit einem Konzert. Ab 1903 sind genug Kinder angemeldet, um den Fortbestand zu sichern.",
+                "bild": "",
+                "bildtext": ""
+            },
+            {
+                "jahr": "1919",
+                "titel": "Schließung",
+                "text": "Im Dezember 1919 wird der Kindergartenbetrieb eingestellt. Während des Zweiten Weltkriegs gibt es vorübergehend wieder einen Kindergarten im Haus Nr. 69.",
+                "bild": "",
+                "bildtext": ""
+            },
+            {
+                "jahr": "1976",
+                "titel": "Neueröffnung am Schulberg",
+                "text": "Nach dem Gemeinderatsbeschluss von 1973 wird ein zweigruppiger Kindergarten gebaut. Landeshauptmann Andreas Maurer eröffnet ihn am 27. Juni 1976. Erste Leiterin ist Renate Weiss, 1988 folgt Ingrid Enengl.",
+                "bild": "",
+                "bildtext": ""
+            },
+            {
+                "jahr": "1990",
+                "titel": "Die dritte Gruppe",
+                "text": "Ein Zubau schafft Platz für eine dritte Kindergartengruppe.",
+                "bild": "",
+                "bildtext": ""
+            },
+            {
+                "jahr": "2008",
+                "titel": "Generalsanierung",
+                "text": "Das Haus wird umfassend saniert.",
+                "bild": "",
+                "bildtext": ""
+            },
+            {
+                "jahr": "2015",
+                "titel": "Tagesbetreuung für die Kleinsten",
+                "text": "Weil immer mehr Familien Betreuung für Kinder von 1 bis 2,5 Jahren brauchen, beginnt im November der Bau einer Kinderbetreuungseinrichtung – ein rund 120 m² großer Zubau mit Gruppenraum, Waschraum, Büro und Garderobe.",
+                "bild": "",
+                "bildtext": ""
+            },
+            {
+                "jahr": "2022",
+                "titel": "Platz für die Käfergruppe",
+                "text": "Für die neue vierte Gruppe wird von Oktober 2021 bis Sommer 2022 um- und zugebaut. Die Käfergruppe ist währenddessen im Pfarrhof zu Gast und zieht pünktlich zum Schulbeginn ein.",
+                "bild": "",
+                "bildtext": ""
+            },
+            {
+                "jahr": "2026",
+                "titel": "50 Jahre Landeskindergarten",
+                "text": "Am 4. Mai 2026 feiert die Marktgemeinde das 50-jährige Bestehen. Heute gibt es am Schulberg 3 einen viergruppigen Landeskindergarten und eine Tagesbetreuungseinrichtung.",
+                "bild": "",
+                "bildtext": ""
+            }
+        ]
+    },
+    "galerie": {
+        "bilder": []
+    },
+    "rechtliches": {
+        "impressum": "**Medieninhaber und Herausgeber:**\nMarktgemeinde Schweiggers\n[Adresse der Gemeinde bitte ergänzen]\n\n**Kontakt Kindergarten:**\nNÖ Landeskindergarten Schweiggers\nAm Schulberg 3, 3931 Schweiggers\nTelefon: 02829 82 73\nE-Mail: kindergarten@schweiggers.gv.at\n\n**Verantwortlich für den Inhalt:**\n[Name bitte ergänzen]\n\n**Fotos:** Kindergarten Schweiggers, sofern nicht anders angegeben.",
+        "datenschutz": "[Bitte gemeinsam mit der Gemeinde bzw. dem Datenschutzbeauftragten ergänzen.]\n\nDiese Website verwendet keine Cookies zu Werbe- oder Analysezwecken und bindet keine Inhalte von Drittanbietern ein. Schriftarten werden direkt von diesem Server geladen.\n\nBeim Aufruf der Website speichert der Webserver technisch notwendige Protokolldaten (z. B. IP-Adresse, Datum und Uhrzeit), um den Betrieb und die Sicherheit zu gewährleisten.\n\nFotos von Kindern werden nur mit Zustimmung der Erziehungsberechtigten veröffentlicht.\n\n**Ihre Rechte:** Sie haben das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung Ihrer Daten sowie das Recht auf Beschwerde bei der Österreichischen Datenschutzbehörde."
+    }
+}

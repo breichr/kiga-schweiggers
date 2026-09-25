@@ -1,0 +1,8 @@
+# Laufzeitdaten gehören nicht ins Repository
+data/config.php
+data/.login-versuche
+data/backups/inhalt-*
+data/content.json.tmp
+uploads/*
+!uploads/.htaccess
+!uploads/.gitkeep

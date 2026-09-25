@@ -1,0 +1,23 @@
+# Für Coolify: Build Pack "Docker Compose" wählen.
+# Die Domain wird in Coolify beim Dienst "web" eingetragen (Port 80).
+services:
+  web:
+    build: .
+    restart: unless-stopped
+    expose:
+      - "80"
+    environment:
+      - TZ=Europe/Vienna
+    volumes:
+      - kiga-data:/var/www/html/data
+      - kiga-uploads:/var/www/html/uploads
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1/health.php') === 'ok' ? 0 : 1);"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  kiga-data:
+  kiga-uploads:

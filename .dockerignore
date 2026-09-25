@@ -1,0 +1,9 @@
+.git
+.gitignore
+data/config.php
+data/.login-versuche
+data/backups/inhalt-*
+uploads/*
+!uploads/.htaccess
+!uploads/.gitkeep
+*.zip
