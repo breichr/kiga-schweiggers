@@ -1,0 +1,11 @@
+.git
+.gitignore
+.dockerignore
+Dockerfile
+docker-compose.yaml
+*.md
+*.zip
+data/*
+!data/content.json
+uploads/*
+!uploads/.htaccess
