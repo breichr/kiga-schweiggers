@@ -60,6 +60,12 @@ function e(?string $s): string
     return htmlspecialchars((string) $s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
+/** Gruppenname escapen, mit Trennhilfe vor „…gruppe“/„…betreuung“ (Nachmittags-betreuung). */
+function e_name(?string $s): string
+{
+    return preg_replace('/(?<=\w)(gruppe|betreuung)\b/u', '&shy;$1', e($s));
+}
+
 /**
  * Einfacher Text → HTML.
  * Leerzeile = neuer Absatz, Zeilenumbruch bleibt erhalten,

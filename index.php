@@ -112,7 +112,7 @@ $v = @filemtime(__DIR__ . '/assets/style.css') ?: 1;
         <?php foreach ($gruppen as $i => $gr): ?>
           <a class="hook" href="#gruppe-<?= $i ?>" style="--c:<?= e(color_hex($gr['farbe'] ?? '')) ?>">
             <span class="hook-sign"><?= symbol_svg($gr['symbol'] ?? '') ?></span>
-            <span class="hook-name"><?= preg_replace('/(?<=\w)(gruppe|betreuung)\b/u', '&shy;$1', e($gr['name'])) ?></span>
+            <span class="hook-name"><?= e_name($gr['name']) ?></span>
           </a>
         <?php endforeach; ?>
       </div>
@@ -187,7 +187,7 @@ $v = @filemtime(__DIR__ . '/assets/style.css') ?: 1;
         <?php foreach ($gruppen as $i => $gr): ?>
           <article class="group" id="gruppe-<?= $i ?>" style="--c:<?= e(color_hex($gr['farbe'] ?? '')) ?>">
             <span class="group-sign"><?= symbol_svg($gr['symbol'] ?? '') ?></span>
-            <h3><?= e($gr['name']) ?></h3>
+            <h3><?= e_name($gr['name']) ?></h3>
             <ul class="people">
               <?php foreach (split_lines($gr['personen'] ?? '') as [$pn, $role]): ?>
                 <li><span class="person"><?= e($pn) ?></span><?php if ($role): ?><span class="role"><?= e($role) ?></span><?php endif; ?></li>
