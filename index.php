@@ -326,7 +326,7 @@ $v = @filemtime(__DIR__ . '/assets/style.css') ?: 1;
     </div>
     <div class="contact-links">
       <?php if (!empty($a['telefon'])): ?><a class="big-link" href="<?= e(tel_link($a['telefon'])) ?>"><?= e($a['telefon']) ?></a><?php endif; ?>
-      <?php if (!empty($a['email'])): ?><a class="big-link" href="mailto:<?= e($a['email']) ?>"><?= e_email($a['email']) ?></a><?php endif; ?>
+      <?php if (!empty($a['email'])): ?><a class="big-link mail" style="--len:<?= mb_strlen($a['email']) ?>" href="mailto:<?= e($a['email']) ?>"><?= e_email($a['email']) ?></a><?php endif; ?>
     </div>
   </div>
   <div class="wrap footer-meta">
