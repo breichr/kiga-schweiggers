@@ -182,8 +182,10 @@ p { margin: 0 0 1em; }
 .site-footer h2 { color: #fff; }
 .footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: end; }
 address { font-style: normal; font-size: 1.1rem; margin-bottom: 1rem; }
-.contact-links { display: grid; gap: .75rem; justify-items: start; }
-.big-link { font-family: var(--display); font-weight: 700; font-size: clamp(1.4rem, 1rem + 1.6vw, 2.1rem); text-decoration: none; overflow-wrap: anywhere; }
+.contact-links { display: grid; gap: .75rem; justify-items: start; container-type: inline-size; }
+/* E-Mail so weit verkleinern, dass sie in eine Zeile passt (--len = Zeichenanzahl) */
+.big-link.mail { font-size: min(clamp(1.4rem, 1rem + 1.6vw, 2.1rem), 100cqi / (var(--len, 30) * .62)); }
+.big-link { font-family: var(--display); font-weight: 700; font-size: clamp(1.4rem, 1rem + 1.6vw, 2.1rem); text-decoration: none; overflow-wrap: break-word; }
 .big-link:hover { color: var(--sun); }
 .footer-meta { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,.15); font-size: .92rem; color: #b8c4bc; }
 .footer-meta .admin-link { margin-left: auto; color: #b8c4bc; }

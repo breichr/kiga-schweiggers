@@ -60,6 +60,12 @@ function e(?string $s): string
     return htmlspecialchars((string) $s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
+/** E-Mail-Adresse escapen, mit Umbruchstelle nach dem „@“ (fürs Handy). */
+function e_email(?string $s): string
+{
+    return str_replace('@', '@<wbr>', e($s));
+}
+
 /** Gruppenname escapen, mit Trennhilfe vor „…gruppe“/„…betreuung“ (Nachmittags-betreuung). */
 function e_name(?string $s): string
 {
