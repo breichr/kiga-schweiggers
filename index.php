@@ -331,9 +331,11 @@ $v = @filemtime(__DIR__ . '/assets/style.css') ?: 1;
   </div>
   <div class="wrap footer-meta">
     <span>© <?= date('Y') ?> <?= e($name) ?></span>
-    <a href="?seite=impressum">Impressum</a>
-    <a href="?seite=datenschutz">Datenschutz</a>
-    <a href="admin/" class="admin-link">Anmelden</a>
+    <span class="footer-links">
+      <a href="?seite=impressum">Impressum</a>
+      <a href="?seite=datenschutz">Datenschutz</a>
+      <a href="admin/" class="admin-link">Anmelden</a>
+    </span>
   </div>
 </footer>
 

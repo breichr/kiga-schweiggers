@@ -188,6 +188,7 @@ address { font-style: normal; font-size: 1.1rem; margin-bottom: 1rem; }
 .big-link { font-family: var(--display); font-weight: 700; font-size: clamp(1.4rem, 1rem + 1.6vw, 2.1rem); text-decoration: none; overflow-wrap: break-word; }
 .big-link:hover { color: var(--sun); }
 .footer-meta { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,.15); font-size: .92rem; color: #b8c4bc; }
+.footer-links { display: flex; flex: 1; gap: 1.5rem; }
 .footer-meta .admin-link { margin-left: auto; color: #b8c4bc; }
 
 /* Impressum / Datenschutz */
@@ -222,6 +223,8 @@ address { font-style: normal; font-size: 1.1rem; margin-bottom: 1rem; }
   .timeline li { grid-template-columns: 1fr; gap: .2rem; padding-left: 2rem; }
   .timeline li::before { left: -1px; }
   .year { text-align: left; }
+  .footer-meta { gap: .75rem; }
+  .footer-links { flex-basis: 100%; gap: 1.25rem; }
   .footer-meta .admin-link { margin-left: 0; }
 }
 
