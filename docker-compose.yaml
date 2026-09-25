@@ -7,12 +7,16 @@ services:
     expose:
       - "80"
     environment:
+      # Coolify erzeugt daraus eine Domain und leitet sie auf Port 80 weiter.
+      - SERVICE_FQDN_WEB_80
       - TZ=Europe/Vienna
+      # Auf 1 setzen und neu starten, um ein vergessenes Passwort zu löschen.
+      - KIGA_RESET_PASSWORD=${KIGA_RESET_PASSWORD:-0}
     volumes:
-      - kiga-data:/var/www/html/data
+      - kiga-data:/var/www/data
       - kiga-uploads:/var/www/html/uploads
     healthcheck:
-      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1/health.php') === 'ok' ? 0 : 1);"]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1/health.php"]
       interval: 30s
       timeout: 5s
       retries: 3

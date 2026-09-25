@@ -6,11 +6,19 @@
 
 declare(strict_types=1);
 
-const ROOT        = __DIR__ . '/..';
-const DATA_FILE   = ROOT . '/data/content.json';
-const CONFIG_FILE = ROOT . '/data/config.php';
-const BACKUP_DIR  = ROOT . '/data/backups';
-const UPLOAD_DIR  = ROOT . '/uploads';
+const ROOT = __DIR__ . '/..';
+
+/*
+ * Inhalte, Passwort und Sicherungen. Auf normalem Webspace liegt der Ordner im Projekt.
+ * Im Docker-Image (Coolify) zeigt KIGA_DATA_DIR auf ein Volume außerhalb
+ * des Web-Verzeichnisses, damit diese Dateien nie abrufbar sind.
+ */
+define('DATA_DIR', rtrim(getenv('KIGA_DATA_DIR') ?: ROOT . '/data', '/'));
+const DATA_FILE   = DATA_DIR . '/content.json';
+const CONFIG_FILE = DATA_DIR . '/config.php';
+const BACKUP_DIR  = DATA_DIR . '/backups';
+const LOGIN_FILE  = DATA_DIR . '/.login-versuche';
+const UPLOAD_DIR  = ROOT . '/uploads'; // wird als /uploads/… ausgeliefert
 const MAX_BACKUPS = 30;
 
 /* ---------- Inhalte ---------- */

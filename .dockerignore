@@ -1,9 +1,11 @@
 .git
 .gitignore
-data/config.php
-data/.login-versuche
-data/backups/inhalt-*
+.dockerignore
+Dockerfile
+docker-compose.yaml
+*.md
+*.zip
+data/*
+!data/content.json
 uploads/*
 !uploads/.htaccess
-!uploads/.gitkeep
-*.zip

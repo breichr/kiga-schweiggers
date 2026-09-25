@@ -118,6 +118,8 @@ client_max_body_size 20m;
 
 Das Projekt bringt alles mit, was Coolify braucht: `Dockerfile`, `docker-compose.yaml`, einen Healthcheck (`/health.php`) und ein Startskript, das leere Volumes beim ersten Start automatisch mit den Startinhalten befüllt.
 
+Im Container liegen Inhalte, Passwort, Sicherungen und Anmeldungen in `/var/www/data`, also **außerhalb** des Web-Verzeichnisses. Sie sind damit grundsätzlich nicht über den Browser abrufbar. Die Sperren für `inc/` und `uploads/` stehen fest in der Apache-Konfiguration des Images (`docker/apache.conf`).
+
 **1. Code in ein Git-Repository legen**
 
 ```bash
@@ -137,12 +139,12 @@ Danach **eine** der beiden Varianten wählen:
 
 *A) Build Pack „Docker Compose“ (am einfachsten)*
 - Coolify liest `docker-compose.yaml` und legt die beiden Volumes `kiga-data` und `kiga-uploads` automatisch an.
-- Beim Dienst **web** die Domain eintragen, z. B. `https://kindergarten.schweiggers.gv.at`.
+- Coolify schlägt über `SERVICE_FQDN_WEB_80` automatisch eine Domain vor. Beim Dienst **web** die eigene Domain eintragen, z. B. `https://kindergarten.schweiggers.gv.at`.
 
 *B) Build Pack „Dockerfile“*
 - *Ports Exposes*: `80`
 - Unter *Persistent Storage* zwei Volumes anlegen:
-  - Ziel `/var/www/html/data`
+  - Ziel `/var/www/data`
   - Ziel `/var/www/html/uploads`
 - Domain eintragen.
 
@@ -150,11 +152,11 @@ Danach **eine** der beiden Varianten wählen:
 
 - *Deploy* klicken. Nach dem Start sollte der Status „healthy“ sein.
 - `https://<Ihre Domain>/admin` aufrufen und das Passwort festlegen.
-- Kontrolle: `https://<Ihre Domain>/data/content.json` muss „Forbidden“ zeigen.
+- Kontrolle: `https://<Ihre Domain>/inc/functions.php` muss „Forbidden“ zeigen.
 
 **Wichtig zu den Volumes**
 - Ohne Volumes gehen bei jedem neuen Deploy alle Änderungen und Fotos verloren.
-- Neue Deploys (z. B. nach Änderungen am Design) lassen Inhalte, Fotos und Passwort unangetastet. Diese liegen ausschließlich in den Volumes.
+- Neue Deploys (z. B. nach Änderungen am Design) lassen Inhalte, Fotos, Passwort und Anmeldungen unangetastet. Diese liegen ausschließlich in den Volumes.
 - Die Datei `data/content.json` im Repository ist nur die Vorlage für den allerersten Start.
 
 **HTTPS**
@@ -172,8 +174,11 @@ docker run --rm -v <volume-name-data>:/d -v <volume-name-uploads>:/u -v /root/ki
 Die genauen Volume-Namen zeigt `docker volume ls` (Coolify stellt eine Kennung voran).
 
 **Passwort zurücksetzen in Coolify**
-Im Terminal des Containers (in Coolify: *Terminal*) ausführen: `rm /var/www/html/data/config.php`
-Danach `/admin` aufrufen und ein neues Passwort festlegen.
+1. Unter *Environment Variables* `KIGA_RESET_PASSWORD` auf `1` setzen und neu starten (*Restart*).
+2. `/admin` aufrufen und ein neues Passwort festlegen.
+3. `KIGA_RESET_PASSWORD` wieder auf `0` setzen, sonst wird das Passwort bei jedem Neustart erneut gelöscht.
+
+Alternativ im Terminal des Containers: `rm /var/www/data/config.php`
 
 ### Umzug von der alten Joomla-Seite
 
@@ -190,7 +195,7 @@ Beim nächsten Aufruf von `/admin` kann ein neues Passwort festgelegt werden. Di
 ### Datensicherung
 
 Alle Inhalte stecken in zwei Ordnern:
-- `data/` – Texte, Einstellungen, automatische Sicherungen
+- `data/` – Texte, Einstellungen, automatische Sicherungen (bei Coolify: Volume unter `/var/www/data`)
 - `uploads/` – Fotos
 
 Diese beiden Ordner regelmäßig zusätzlich extern sichern.
@@ -202,7 +207,7 @@ index.php          Öffentliche Website
 health.php         Statusprüfung für Coolify/Docker
 Dockerfile         Image-Bauplan
 docker-compose.yaml  Für Coolify (Build Pack „Docker Compose“)
-docker/            Startskript für den Container
+docker/            Startskript, Apache- und PHP-Einstellungen für den Container
 admin/             Verwaltung (Anmeldung, Bearbeiten, Foto-Upload)
 inc/functions.php  Gemeinsame Funktionen und Aufbau der Bereiche
 assets/            Gestaltung, Schriften, Skripte

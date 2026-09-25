@@ -65,14 +65,14 @@ function check_csrf(): bool
 /** Einfache Sperre gegen Passwort-Raten: nach 5 Fehlversuchen 10 Minuten Pause. */
 function login_blocked(): bool
 {
-    $f = ROOT . '/data/.login-versuche';
+    $f = LOGIN_FILE;
     $d = is_file($f) ? json_decode((string) file_get_contents($f), true) : null;
     return is_array($d) && ($d['n'] ?? 0) >= 5 && ($d['t'] ?? 0) > time() - 600;
 }
 
 function login_failed(): void
 {
-    $f = ROOT . '/data/.login-versuche';
+    $f = LOGIN_FILE;
     $d = is_file($f) ? json_decode((string) file_get_contents($f), true) : null;
     if (!is_array($d) || ($d['t'] ?? 0) < time() - 600) {
         $d = ['n' => 0];
@@ -84,5 +84,5 @@ function login_failed(): void
 
 function login_reset(): void
 {
-    @unlink(ROOT . '/data/.login-versuche');
+    @unlink(LOGIN_FILE);
 }

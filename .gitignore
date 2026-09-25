@@ -6,3 +6,4 @@ data/content.json.tmp
 uploads/*
 !uploads/.htaccess
 !uploads/.gitkeep
+data/sessions/
