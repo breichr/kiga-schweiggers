@@ -1,14 +1,14 @@
 # Website Kindergarten Schweiggers
 
 Kleine, datenbankfreie PHP-Website mit eigener Verwaltung (`/admin`).
+Läuft auf jedem normalen Webspace mit PHP 8.1+ – Hochladen per FTP genügt.
 
-- Hosting auf eigenem Server mit Docker und Caddy: siehe [ANLEITUNG.md](ANLEITUNG.md), „Variante 3“
+- Einrichten auf dem Webspace: siehe [ANLEITUNG.md](ANLEITUNG.md), Teil B
 - Inhalte bearbeiten: siehe [ANLEITUNG.md](ANLEITUNG.md), Teil A
 
 Lokal testen:
 
 ```bash
-docker build -t kiga .
-docker run --rm -p 8080:80 -v kiga-data:/var/www/data -v kiga-uploads:/var/www/html/uploads kiga
+php -S localhost:8080
 # danach http://localhost:8080 und http://localhost:8080/admin
 ```

@@ -1,4 +1,5 @@
 # Laufzeitdaten gehören nicht ins Repository
+data/content.json
 data/config.php
 data/.login-versuche
 data/backups/inhalt-*

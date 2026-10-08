@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require __DIR__ . '/../inc/functions.php';
 
-/** HTTPS erkennen – auch hinter einem Proxy wie Traefik/Caddy von Coolify. */
+/** HTTPS erkennen – auch hinter einem Proxy (X-Forwarded-Proto). */
 function is_https(): bool
 {
     if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
@@ -19,6 +19,16 @@ session_set_cookie_params([
     'httponly' => true,
     'samesite' => 'Strict',
 ]);
+// Eigene Ablage für Anmeldungen: Auf geteiltem Webspace räumen sonst fremde
+// Seiten den gemeinsamen Sitzungsordner auf und melden einen nach Minuten ab.
+$sessDir = DATA_DIR . '/sessions';
+if (is_dir($sessDir) || @mkdir($sessDir, 0770, true)) {
+    if (is_writable($sessDir)) {
+        session_save_path($sessDir);
+    }
+}
+ini_set('session.gc_maxlifetime', '14400');
+ini_set('session.use_strict_mode', '1');
 session_name('kgadmin');
 session_start();
 

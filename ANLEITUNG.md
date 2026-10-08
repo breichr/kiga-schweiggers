@@ -86,26 +86,68 @@ Wenn das Passwort vergessen wurde: siehe Teil B, „Passwort zurücksetzen“.
 
 ## Teil B: Einrichtung (einmalig)
 
+Die Website ist für einen ganz normalen Webspace gebaut (z. B. bei World4You, easyname, all-inkl, Hetzner Webhosting). Es braucht keine Datenbank, keinen Server und kein Docker – nur FTP-Zugang.
+
 ### Voraussetzungen
 
-- Webspace mit **PHP 8.1 oder neuer** (bei fast allen Anbietern vorhanden)
+- Webspace mit **PHP 8.1 oder neuer** (im Kundenmenü des Anbieters einstellbar)
+- Apache-Webserver, der `.htaccess`-Dateien liest (Standard bei fast allen Anbietern; für nginx siehe unten)
 - Empfohlen: PHP-Erweiterung **GD** (für das automatische Verkleinern von Fotos). Ohne GD werden Fotos unverändert gespeichert.
-- Keine Datenbank nötig.
+- **HTTPS** für die Domain (bei den meisten Anbietern ein Klick, z. B. „Let's Encrypt aktivieren“)
+- Ein FTP-Programm, z. B. [FileZilla](https://filezilla-project.org/)
 
-### Variante 1: Normaler Webspace (Apache)
+### Dateien besorgen
 
-1. Den Inhalt dieses Ordners per FTP in das Hauptverzeichnis der Domain hochladen (inklusive der versteckten `.htaccess`-Dateien).
-2. Schreibrechte für den Webserver auf die Ordner `data/` und `uploads/` vergeben (meist `775` oder `755`, je nach Anbieter).
-3. `https://…/admin` aufrufen und ein Passwort festlegen (mindestens 10 Zeichen).
-4. Unbedingt **HTTPS** verwenden, damit das Passwort verschlüsselt übertragen wird.
+Auf GitHub im Repository auf **Code → Download ZIP** klicken und das ZIP auf dem eigenen Rechner entpacken.
+Die Dateien `README.md`, `ANLEITUNG.md` und `.gitignore` werden auf dem Webspace nicht gebraucht, stören aber auch nicht.
+
+### Erstes Einrichten
+
+1. **Versteckte Dateien sichtbar machen.** In FileZilla: *Server → Anzeigen versteckter Dateien erzwingen*. Sonst fehlen die `.htaccess`-Dateien und `.user.ini`, und die Schutzregeln wirken nicht.
+2. **Hochladen.** Den gesamten Inhalt des entpackten Ordners in das Hauptverzeichnis der Domain hochladen (oft `html`, `httpdocs` oder `public_html`). Eine Unterseite wie `https://…/kindergarten/` funktioniert genauso.
+3. **Schreibrechte vergeben.** In FileZilla mit Rechtsklick auf die Ordner `data` und `uploads` → *Dateiberechtigungen* → `755` eintragen, Haken bei *In Unterverzeichnisse einsteigen*. Falls die Verwaltung danach meldet, dass sie nicht schreiben darf: `775` probieren, notfalls `777` (nur für diese beiden Ordner).
+4. **Passwort festlegen.** `https://<Ihre Domain>/admin` aufrufen und ein Passwort festlegen (mindestens 10 Zeichen). Beim ersten Aufruf übernimmt die Website die Startinhalte automatisch.
+5. **Schutz prüfen.** Diese Adressen müssen eine Fehlermeldung (403 „Forbidden“) zeigen, nicht den Inhalt:
+   - `https://<Ihre Domain>/data/content.json`
+   - `https://<Ihre Domain>/inc/functions.php`
+
+   Wird der Inhalt angezeigt, fehlen die `.htaccess`-Dateien (Schritt 1) oder der Anbieter verwendet nginx (siehe unten).
+6. **Fotos testen.** In der Verwaltung ein Foto hochladen. Klappt das bei großen Handyfotos nicht, im Kundenmenü des Anbieters `upload_max_filesize` auf mindestens 16 MB und `memory_limit` auf 256 MB setzen. Die mitgelieferten `.htaccess` und `.user.ini` versuchen das bereits automatisch, nicht jeder Anbieter erlaubt es aber.
 
 Die mitgelieferten `.htaccess`-Dateien sperren den Zugriff auf `data/` und `inc/` und verhindern, dass im Ordner `uploads/` Programme ausgeführt werden.
 
-**Prüfen Sie nach der Einrichtung:** `https://…/data/content.json` muss eine Fehlermeldung (403) liefern, nicht den Inhalt.
+### Was wo liegt
 
-### Variante 2: nginx
+Alle Inhalte, die über die Verwaltung entstehen, stecken in zwei Ordnern:
+- `data/` – Texte (`content.json`), Passwort (`config.php`), automatische Sicherungen (`backups/`), Anmeldungen (`sessions/`)
+- `uploads/` – Fotos
 
-nginx liest keine `.htaccess`-Dateien. Diese Regeln in die Serverkonfiguration übernehmen:
+Der restliche Code enthält keine Inhalte. Die Vorlage für den allerersten Start liegt getrennt in `inc/startinhalt.json`.
+
+### Neue Version einspielen (z. B. nach Änderungen am Design)
+
+1. Neues ZIP herunterladen und entpacken.
+2. Alles per FTP hochladen und vorhandene Dateien **überschreiben**.
+
+Inhalte, Fotos und Passwort bleiben dabei erhalten: In den Ordnern `data/` und `uploads/` liegen im ZIP nur Schutzdateien, die eigentlichen Inhalte entstehen erst auf dem Webspace.
+Vorsichtshalber trotzdem vorher eine Datensicherung machen (siehe unten). Und **nie** die Ordner `data` oder `uploads` auf dem Webspace löschen.
+
+### Datensicherung
+
+Regelmäßig (z. B. einmal im Monat und vor jedem Update) die Ordner `data/` und `uploads/` per FTP auf den eigenen Rechner herunterladen.
+
+Zusätzlich legt die Website bei jedem Speichern automatisch eine Sicherung der Texte an (die letzten 30). Diese lassen sich in der Verwaltung wiederherstellen.
+
+Wiederherstellen einer FTP-Sicherung: die beiden Ordner wieder hochladen und vorhandene Dateien überschreiben.
+
+### Passwort zurücksetzen
+
+Die Datei `data/config.php` per FTP löschen.
+Beim nächsten Aufruf von `/admin` kann ein neues Passwort festgelegt werden. Die Inhalte bleiben erhalten.
+
+### Sonderfall nginx
+
+nginx liest keine `.htaccess`-Dateien. Läuft der Webspace mit nginx, muss der Anbieter (oder wer den Server betreut) diese Regeln in die Serverkonfiguration übernehmen:
 
 ```nginx
 location ~ ^/(data|inc)/ { deny all; }
@@ -114,117 +156,6 @@ location ~ /\. { deny all; }
 client_max_body_size 20m;
 ```
 
-### Variante 3: Eigener Server (VPS) mit Docker und Caddy (empfohlen)
-
-Das Projekt bringt alles für den Betrieb in Docker mit: `Dockerfile`, `docker-compose.yaml`, einen Healthcheck (`/health.php`) und ein Startskript, das leere Volumes beim ersten Start automatisch mit den Startinhalten befüllt. Caddy läuft davor als Reverse Proxy und kümmert sich um HTTPS.
-
-Im Container liegen Inhalte, Passwort, Sicherungen und Anmeldungen in `/var/www/data`, also **außerhalb** des Web-Verzeichnisses. Sie sind damit grundsätzlich nicht über den Browser abrufbar. Die Sperren für `inc/` und `uploads/` stehen fest in der Apache-Konfiguration des Images (`docker/apache.conf`).
-
-**Voraussetzungen auf dem Server**
-- Docker mit dem Compose-Plugin (`docker compose version` muss funktionieren)
-- Caddy (z. B. als Systemdienst aus dem offiziellen Paket)
-- Ports 80 und 443 in der Firewall offen
-- Die Domain zeigt per DNS (A-Eintrag) auf die IP-Adresse des Servers. Bei einer Gemeinde-Domain (`.gv.at`) muss das die Stelle einrichten, die die Domain der Gemeinde verwaltet.
-
-**1. Code auf den Server holen**
-
-```bash
-git clone https://github.com/breichr/kiga-schweiggers.git /opt/kiga
-cd /opt/kiga
-```
-
-Bei einem privaten Repository vorher einen Deploy-Key (nur Lesezugriff) in GitHub hinterlegen und über die SSH-Adresse klonen.
-Die mitgelieferte `.gitignore` sorgt dafür, dass Passwort, Sicherungen und Fotos nie ins Repository gelangen.
-
-**2. Port nur für Caddy freigeben**
-
-Die `docker-compose.yaml` öffnet keinen Port nach außen. Daneben die Datei `/opt/kiga/docker-compose.override.yml` anlegen (sie bleibt nur auf dem Server und wird von Docker Compose automatisch mitgelesen):
-
-```yaml
-services:
-  web:
-    ports:
-      - "127.0.0.1:8080:80"   # nur lokal erreichbar, nicht aus dem Internet
-```
-
-**3. Starten**
-
-```bash
-docker compose up -d --build
-docker compose ps                          # Status sollte „healthy“ zeigen
-curl -I http://127.0.0.1:8080/health.php   # sollte „200 OK“ liefern
-```
-
-Docker legt dabei die beiden Volumes `kiga_kiga-data` und `kiga_kiga-uploads` an (der Teil vor dem Unterstrich ist der Ordnername `kiga`).
-
-**4. Caddy einrichten**
-
-In `/etc/caddy/Caddyfile` (Domain anpassen):
-
-```caddy
-kindergarten.schweiggers.gv.at {
-    encode zstd gzip
-    reverse_proxy 127.0.0.1:8080
-}
-```
-
-```bash
-sudo systemctl reload caddy
-```
-
-Caddy holt das HTTPS-Zertifikat automatisch und leitet `http://` auf `https://` um. Die Website erkennt HTTPS hinter dem Proxy (über den Header `X-Forwarded-Proto`) und setzt das Anmelde-Cookie entsprechend sicher. Die echte Besucher-IP kommt ebenfalls an.
-
-*Falls Caddy selbst in einem Docker-Container läuft:* Schritt 2 weglassen, beide Container in ein gemeinsames Docker-Netzwerk hängen und im Caddyfile `reverse_proxy web:80` statt `127.0.0.1:8080` eintragen.
-
-**5. Einrichten**
-
-- `https://<Ihre Domain>/admin` aufrufen und das Passwort festlegen (mindestens 10 Zeichen).
-- Kontrolle: `https://<Ihre Domain>/inc/functions.php` muss „Forbidden“ zeigen.
-
-**Updates einspielen**
-
-Nach Änderungen am Code (z. B. am Design):
-
-```bash
-cd /opt/kiga
-git pull
-docker compose up -d --build
-```
-
-**Wichtig zu den Volumes**
-- Inhalte, Fotos, Passwort und Anmeldungen liegen ausschließlich in den Volumes. Ein Update lässt sie unangetastet.
-- **Niemals** `docker compose down -v` ausführen: Das `-v` löscht die Volumes und damit alle Inhalte.
-- Die Datei `data/content.json` im Repository ist nur die Vorlage für den allerersten Start.
-
-**Sicherung der Volumes**
-Die Inhalte regelmäßig sichern, z. B. täglich per Cronjob auf dem Server (`crontab -e`):
-
-```bash
-30 3 * * * docker run --rm -v kiga_kiga-data:/d -v kiga_kiga-uploads:/u -v /root/kiga-backup:/b alpine tar czf /b/kiga-$(date +\%F).tar.gz -C / d u
-```
-
-Die Sicherungsdateien zusätzlich vom Server wegkopieren (z. B. auf einen anderen Rechner oder Speicherplatz).
-
-Wiederherstellen einer Sicherung:
-
-```bash
-cd /opt/kiga && docker compose stop
-docker run --rm -v kiga_kiga-data:/d -v kiga_kiga-uploads:/u -v /root/kiga-backup:/b alpine \
-  tar xzf /b/kiga-JJJJ-MM-TT.tar.gz -C /
-docker compose start
-```
-
-**Passwort zurücksetzen**
-
-```bash
-cd /opt/kiga
-docker compose exec web rm -f /var/www/data/config.php /var/www/data/.login-versuche
-```
-
-Danach `/admin` aufrufen und ein neues Passwort festlegen. Die Inhalte bleiben erhalten.
-
-*Hinweis:* Das Image läuft genauso in Coolify oder anderen Docker-Plattformen (Build Pack „Docker Compose“, Domain beim Dienst `web` auf Port 80).
-
 ### Umzug von der alten Joomla-Seite
 
 1. Fotos von der alten Seite abspeichern, **bevor** sie abgeschaltet wird (Teamfoto, Waldtage, historische Aufnahmen, Diashow).
@@ -232,32 +163,17 @@ Danach `/admin` aufrufen und ein neues Passwort festlegen. Die Inhalte bleiben e
 3. **Impressum und Datenschutz** mit der Gemeinde vervollständigen. Die Platzhalter sind mit `[bitte ergänzen]` markiert.
 4. Erst dann die Domain auf die neue Seite umstellen.
 
-### Passwort zurücksetzen
-
-Die Datei `data/config.php` per FTP löschen (beim eigenen Server: siehe Variante 3).
-Beim nächsten Aufruf von `/admin` kann ein neues Passwort festgelegt werden. Die Inhalte bleiben erhalten.
-
-### Datensicherung
-
-Alle Inhalte stecken in zwei Ordnern:
-- `data/` – Texte, Einstellungen, automatische Sicherungen (bei Docker: Volume unter `/var/www/data`)
-- `uploads/` – Fotos
-
-Diese beiden Ordner regelmäßig zusätzlich extern sichern.
-
 ### Aufbau der Dateien
 
 ```
-index.php          Öffentliche Website
-health.php         Statusprüfung für Docker
-Dockerfile         Image-Bauplan
-docker-compose.yaml  Startet den Container (docker compose)
-docker/            Startskript, Apache- und PHP-Einstellungen für den Container
-admin/             Verwaltung (Anmeldung, Bearbeiten, Foto-Upload)
-inc/functions.php  Gemeinsame Funktionen und Aufbau der Bereiche
-assets/            Gestaltung, Schriften, Skripte
-data/content.json  Alle Inhalte
-uploads/           Hochgeladene Fotos
+index.php            Öffentliche Website
+admin/               Verwaltung (Anmeldung, Bearbeiten, Foto-Upload)
+inc/functions.php    Gemeinsame Funktionen und Aufbau der Bereiche
+inc/startinhalt.json Startinhalte für den allerersten Aufruf
+assets/              Gestaltung, Schriften, Skripte
+data/                Inhalte, Passwort, Sicherungen (entsteht auf dem Webspace)
+uploads/             Hochgeladene Fotos
+.htaccess, .user.ini Schutzregeln und PHP-Einstellungen
 ```
 
 Neue Felder oder Bereiche werden in `inc/functions.php` in der Funktion `schema()` ergänzt. Die Verwaltung baut ihre Formulare daraus automatisch.
