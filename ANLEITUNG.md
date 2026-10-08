@@ -86,26 +86,68 @@ Wenn das Passwort vergessen wurde: siehe Teil B, „Passwort zurücksetzen“.
 
 ## Teil B: Einrichtung (einmalig)
 
+Die Website ist für einen ganz normalen Webspace gebaut (z. B. bei World4You, easyname, all-inkl, Hetzner Webhosting). Es braucht keine Datenbank, keinen Server und kein Docker – nur FTP-Zugang.
+
 ### Voraussetzungen
 
-- Webspace mit **PHP 8.1 oder neuer** (bei fast allen Anbietern vorhanden)
+- Webspace mit **PHP 8.1 oder neuer** (im Kundenmenü des Anbieters einstellbar)
+- Apache-Webserver, der `.htaccess`-Dateien liest (Standard bei fast allen Anbietern; für nginx siehe unten)
 - Empfohlen: PHP-Erweiterung **GD** (für das automatische Verkleinern von Fotos). Ohne GD werden Fotos unverändert gespeichert.
-- Keine Datenbank nötig.
+- **HTTPS** für die Domain (bei den meisten Anbietern ein Klick, z. B. „Let's Encrypt aktivieren“)
+- Ein FTP-Programm, z. B. [FileZilla](https://filezilla-project.org/)
 
-### Variante 1: Normaler Webspace (Apache)
+### Dateien besorgen
 
-1. Den Inhalt dieses Ordners per FTP in das Hauptverzeichnis der Domain hochladen (inklusive der versteckten `.htaccess`-Dateien).
-2. Schreibrechte für den Webserver auf die Ordner `data/` und `uploads/` vergeben (meist `775` oder `755`, je nach Anbieter).
-3. `https://…/admin` aufrufen und ein Passwort festlegen (mindestens 10 Zeichen).
-4. Unbedingt **HTTPS** verwenden, damit das Passwort verschlüsselt übertragen wird.
+Auf GitHub im Repository auf **Code → Download ZIP** klicken und das ZIP auf dem eigenen Rechner entpacken.
+Die Dateien `README.md`, `ANLEITUNG.md` und `.gitignore` werden auf dem Webspace nicht gebraucht, stören aber auch nicht.
+
+### Erstes Einrichten
+
+1. **Versteckte Dateien sichtbar machen.** In FileZilla: *Server → Anzeigen versteckter Dateien erzwingen*. Sonst fehlen die `.htaccess`-Dateien und `.user.ini`, und die Schutzregeln wirken nicht.
+2. **Hochladen.** Den gesamten Inhalt des entpackten Ordners in das Hauptverzeichnis der Domain hochladen (oft `html`, `httpdocs` oder `public_html`). Eine Unterseite wie `https://…/kindergarten/` funktioniert genauso.
+3. **Schreibrechte vergeben.** In FileZilla mit Rechtsklick auf die Ordner `data` und `uploads` → *Dateiberechtigungen* → `755` eintragen, Haken bei *In Unterverzeichnisse einsteigen*. Falls die Verwaltung danach meldet, dass sie nicht schreiben darf: `775` probieren, notfalls `777` (nur für diese beiden Ordner).
+4. **Passwort festlegen.** `https://<Ihre Domain>/admin` aufrufen und ein Passwort festlegen (mindestens 10 Zeichen). Beim ersten Aufruf übernimmt die Website die Startinhalte automatisch.
+5. **Schutz prüfen.** Diese Adressen müssen eine Fehlermeldung (403 „Forbidden“) zeigen, nicht den Inhalt:
+   - `https://<Ihre Domain>/data/content.json`
+   - `https://<Ihre Domain>/inc/functions.php`
+
+   Wird der Inhalt angezeigt, fehlen die `.htaccess`-Dateien (Schritt 1) oder der Anbieter verwendet nginx (siehe unten).
+6. **Fotos testen.** In der Verwaltung ein Foto hochladen. Klappt das bei großen Handyfotos nicht, im Kundenmenü des Anbieters `upload_max_filesize` auf mindestens 16 MB und `memory_limit` auf 256 MB setzen. Die mitgelieferten `.htaccess` und `.user.ini` versuchen das bereits automatisch, nicht jeder Anbieter erlaubt es aber.
 
 Die mitgelieferten `.htaccess`-Dateien sperren den Zugriff auf `data/` und `inc/` und verhindern, dass im Ordner `uploads/` Programme ausgeführt werden.
 
-**Prüfen Sie nach der Einrichtung:** `https://…/data/content.json` muss eine Fehlermeldung (403) liefern, nicht den Inhalt.
+### Was wo liegt
 
-### Variante 2: nginx
+Alle Inhalte, die über die Verwaltung entstehen, stecken in zwei Ordnern:
+- `data/` – Texte (`content.json`), Passwort (`config.php`), automatische Sicherungen (`backups/`), Anmeldungen (`sessions/`)
+- `uploads/` – Fotos
 
-nginx liest keine `.htaccess`-Dateien. Diese Regeln in die Serverkonfiguration übernehmen:
+Der restliche Code enthält keine Inhalte. Die Vorlage für den allerersten Start liegt getrennt in `inc/startinhalt.json`.
+
+### Neue Version einspielen (z. B. nach Änderungen am Design)
+
+1. Neues ZIP herunterladen und entpacken.
+2. Alles per FTP hochladen und vorhandene Dateien **überschreiben**.
+
+Inhalte, Fotos und Passwort bleiben dabei erhalten: In den Ordnern `data/` und `uploads/` liegen im ZIP nur Schutzdateien, die eigentlichen Inhalte entstehen erst auf dem Webspace.
+Vorsichtshalber trotzdem vorher eine Datensicherung machen (siehe unten). Und **nie** die Ordner `data` oder `uploads` auf dem Webspace löschen.
+
+### Datensicherung
+
+Regelmäßig (z. B. einmal im Monat und vor jedem Update) die Ordner `data/` und `uploads/` per FTP auf den eigenen Rechner herunterladen.
+
+Zusätzlich legt die Website bei jedem Speichern automatisch eine Sicherung der Texte an (die letzten 30). Diese lassen sich in der Verwaltung wiederherstellen.
+
+Wiederherstellen einer FTP-Sicherung: die beiden Ordner wieder hochladen und vorhandene Dateien überschreiben.
+
+### Passwort zurücksetzen
+
+Die Datei `data/config.php` per FTP löschen.
+Beim nächsten Aufruf von `/admin` kann ein neues Passwort festgelegt werden. Die Inhalte bleiben erhalten.
+
+### Sonderfall nginx
+
+nginx liest keine `.htaccess`-Dateien. Läuft der Webspace mit nginx, muss der Anbieter (oder wer den Server betreut) diese Regeln in die Serverkonfiguration übernehmen:
 
 ```nginx
 location ~ ^/(data|inc)/ { deny all; }
@@ -114,72 +156,6 @@ location ~ /\. { deny all; }
 client_max_body_size 20m;
 ```
 
-### Variante 3: Coolify (empfohlen für eigenen Server)
-
-Das Projekt bringt alles mit, was Coolify braucht: `Dockerfile`, `docker-compose.yaml`, einen Healthcheck (`/health.php`) und ein Startskript, das leere Volumes beim ersten Start automatisch mit den Startinhalten befüllt.
-
-Im Container liegen Inhalte, Passwort, Sicherungen und Anmeldungen in `/var/www/data`, also **außerhalb** des Web-Verzeichnisses. Sie sind damit grundsätzlich nicht über den Browser abrufbar. Die Sperren für `inc/` und `uploads/` stehen fest in der Apache-Konfiguration des Images (`docker/apache.conf`).
-
-**1. Code in ein Git-Repository legen**
-
-```bash
-cd kindergarten-schweiggers
-git init && git add . && git commit -m "Website Kindergarten Schweiggers"
-git remote add origin <URL Ihres Repositorys>
-git push -u origin main
-```
-
-Die mitgelieferte `.gitignore` sorgt dafür, dass Passwort, Sicherungen und Fotos nie ins Repository gelangen.
-Für ein privates Repository in Coolify vorher die GitHub-App oder einen Deploy-Key einrichten.
-
-**2. In Coolify anlegen**
-
-Projekt → *New Resource* → *Private/Public Repository* → Repository wählen.
-Danach **eine** der beiden Varianten wählen:
-
-*A) Build Pack „Docker Compose“ (am einfachsten)*
-- Coolify liest `docker-compose.yaml` und legt die beiden Volumes `kiga-data` und `kiga-uploads` automatisch an.
-- Coolify schlägt über `SERVICE_FQDN_WEB_80` automatisch eine Domain vor. Beim Dienst **web** die eigene Domain eintragen, z. B. `https://kindergarten.schweiggers.gv.at`.
-
-*B) Build Pack „Dockerfile“*
-- *Ports Exposes*: `80`
-- Unter *Persistent Storage* zwei Volumes anlegen:
-  - Ziel `/var/www/data`
-  - Ziel `/var/www/html/uploads`
-- Domain eintragen.
-
-**3. Deployen und einrichten**
-
-- *Deploy* klicken. Nach dem Start sollte der Status „healthy“ sein.
-- `https://<Ihre Domain>/admin` aufrufen und das Passwort festlegen.
-- Kontrolle: `https://<Ihre Domain>/inc/functions.php` muss „Forbidden“ zeigen.
-
-**Wichtig zu den Volumes**
-- Ohne Volumes gehen bei jedem neuen Deploy alle Änderungen und Fotos verloren.
-- Neue Deploys (z. B. nach Änderungen am Design) lassen Inhalte, Fotos, Passwort und Anmeldungen unangetastet. Diese liegen ausschließlich in den Volumes.
-- Die Datei `data/content.json` im Repository ist nur die Vorlage für den allerersten Start.
-
-**HTTPS**
-Coolify stellt das Zertifikat über seinen Proxy automatisch aus. Die Website erkennt HTTPS hinter dem Proxy und setzt das Anmelde-Cookie entsprechend sicher.
-Die Domain muss per DNS (A-Eintrag) auf die IP-Adresse des Servers zeigen. Bei einer Gemeinde-Domain (`.gv.at`) muss das die Stelle einrichten, die die Domain der Gemeinde verwaltet.
-
-**Sicherung der Volumes**
-Coolify sichert automatisch nur Datenbanken, keine Volumes. Die Inhalte deshalb zusätzlich regelmäßig sichern, z. B. per Cronjob auf dem Server:
-
-```bash
-docker run --rm -v <volume-name-data>:/d -v <volume-name-uploads>:/u -v /root/kiga-backup:/b alpine \
-  tar czf /b/kiga-$(date +%F).tar.gz -C / d u
-```
-
-Die genauen Volume-Namen zeigt `docker volume ls` (Coolify stellt eine Kennung voran).
-
-**Passwort zurücksetzen in Coolify**
-1. Unter *Environment Variables* `KIGA_RESET_PASSWORD` auf `1` setzen und neu starten (*Restart*).
-2. `/admin` aufrufen und ein neues Passwort festlegen.
-3. `KIGA_RESET_PASSWORD` wieder auf `0` setzen, sonst wird das Passwort bei jedem Neustart erneut gelöscht.
-
-Alternativ im Terminal des Containers: `rm /var/www/data/config.php`
-
 ### Umzug von der alten Joomla-Seite
 
 1. Fotos von der alten Seite abspeichern, **bevor** sie abgeschaltet wird (Teamfoto, Waldtage, historische Aufnahmen, Diashow).
@@ -187,32 +163,17 @@ Alternativ im Terminal des Containers: `rm /var/www/data/config.php`
 3. **Impressum und Datenschutz** mit der Gemeinde vervollständigen. Die Platzhalter sind mit `[bitte ergänzen]` markiert.
 4. Erst dann die Domain auf die neue Seite umstellen.
 
-### Passwort zurücksetzen
-
-Die Datei `data/config.php` per FTP löschen (bei Coolify: siehe oben).
-Beim nächsten Aufruf von `/admin` kann ein neues Passwort festgelegt werden. Die Inhalte bleiben erhalten.
-
-### Datensicherung
-
-Alle Inhalte stecken in zwei Ordnern:
-- `data/` – Texte, Einstellungen, automatische Sicherungen (bei Coolify: Volume unter `/var/www/data`)
-- `uploads/` – Fotos
-
-Diese beiden Ordner regelmäßig zusätzlich extern sichern.
-
 ### Aufbau der Dateien
 
 ```
-index.php          Öffentliche Website
-health.php         Statusprüfung für Coolify/Docker
-Dockerfile         Image-Bauplan
-docker-compose.yaml  Für Coolify (Build Pack „Docker Compose“)
-docker/            Startskript, Apache- und PHP-Einstellungen für den Container
-admin/             Verwaltung (Anmeldung, Bearbeiten, Foto-Upload)
-inc/functions.php  Gemeinsame Funktionen und Aufbau der Bereiche
-assets/            Gestaltung, Schriften, Skripte
-data/content.json  Alle Inhalte
-uploads/           Hochgeladene Fotos
+index.php            Öffentliche Website
+admin/               Verwaltung (Anmeldung, Bearbeiten, Foto-Upload)
+inc/functions.php    Gemeinsame Funktionen und Aufbau der Bereiche
+inc/startinhalt.json Startinhalte für den allerersten Aufruf
+assets/              Gestaltung, Schriften, Skripte
+data/                Inhalte, Passwort, Sicherungen (entsteht auf dem Webspace)
+uploads/             Hochgeladene Fotos
+.htaccess, .user.ini Schutzregeln und PHP-Einstellungen
 ```
 
 Neue Felder oder Bereiche werden in `inc/functions.php` in der Funktion `schema()` ergänzt. Die Verwaltung baut ihre Formulare daraus automatisch.

@@ -25,10 +25,13 @@ if (!$cfg) {
             header('Location: ./?willkommen=1'); exit;
         }
     }
-    render_page('Einrichtung', function () use ($msg, $msgType) { ?>
+    // Häufigster Fehler beim Hochladen per FTP: fehlende Schreibrechte
+    $ohneRechte = array_keys(array_filter(['data' => DATA_DIR, 'uploads' => UPLOAD_DIR], fn ($d) => !is_writable($d)));
+    render_page('Einrichtung', function () use ($msg, $msgType, $ohneRechte) { ?>
       <div class="login-box">
         <h1>Willkommen!</h1>
         <p>Legen Sie ein Passwort für die Verwaltung der Website fest. Alle, die Inhalte bearbeiten, verwenden dieses Passwort.</p>
+        <?php if ($ohneRechte) flash('Der Webserver darf in folgende Ordner nicht schreiben: „' . implode('“, „', $ohneRechte) . '“. Bitte die Schreibrechte per FTP anpassen (siehe Anleitung).', 'err'); ?>
         <?php flash($msg, $msgType); ?>
         <form method="post">
           <input type="hidden" name="aktion" value="einrichten">

@@ -9,26 +9,34 @@ declare(strict_types=1);
 const ROOT = __DIR__ . '/..';
 
 /*
- * Inhalte, Passwort und Sicherungen. Auf normalem Webspace liegt der Ordner im Projekt.
- * Im Docker-Image (Coolify) zeigt KIGA_DATA_DIR auf ein Volume außerhalb
- * des Web-Verzeichnisses, damit diese Dateien nie abrufbar sind.
+ * Inhalte, Passwort, Sicherungen und Anmeldungen liegen in data/ (per .htaccess gesperrt).
+ * Fotos liegen in uploads/. Beide Ordner braucht der Webserver mit Schreibrechten.
  */
-define('DATA_DIR', rtrim(getenv('KIGA_DATA_DIR') ?: ROOT . '/data', '/'));
+const DATA_DIR    = ROOT . '/data';
+const SEED_FILE   = __DIR__ . '/startinhalt.json'; // Vorlage für den allerersten Aufruf
 const DATA_FILE   = DATA_DIR . '/content.json';
 const CONFIG_FILE = DATA_DIR . '/config.php';
 const BACKUP_DIR  = DATA_DIR . '/backups';
 const LOGIN_FILE  = DATA_DIR . '/.login-versuche';
-const UPLOAD_DIR  = ROOT . '/uploads'; // wird als /uploads/… ausgeliefert
+const UPLOAD_DIR  = ROOT . '/uploads'; // wird als uploads/… ausgeliefert
 const MAX_BACKUPS = 30;
+
+date_default_timezone_set('Europe/Vienna');
 
 /* ---------- Inhalte ---------- */
 
 function load_content(): array
 {
-    if (!is_file(DATA_FILE)) {
+    // Erster Aufruf: Startinhalte übernehmen. Ein späteres Update der Dateien
+    // überschreibt data/content.json so nie, die Vorlage liegt getrennt in inc/.
+    if (!is_file(DATA_FILE) && is_file(SEED_FILE)) {
+        @copy(SEED_FILE, DATA_FILE);
+    }
+    $file = is_file(DATA_FILE) ? DATA_FILE : SEED_FILE;
+    if (!is_file($file)) {
         return [];
     }
-    $data = json_decode((string) file_get_contents(DATA_FILE), true);
+    $data = json_decode((string) file_get_contents($file), true);
     return is_array($data) ? $data : [];
 }
 
