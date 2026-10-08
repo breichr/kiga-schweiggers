@@ -114,71 +114,116 @@ location ~ /\. { deny all; }
 client_max_body_size 20m;
 ```
 
-### Variante 3: Coolify (empfohlen für eigenen Server)
+### Variante 3: Eigener Server (VPS) mit Docker und Caddy (empfohlen)
 
-Das Projekt bringt alles mit, was Coolify braucht: `Dockerfile`, `docker-compose.yaml`, einen Healthcheck (`/health.php`) und ein Startskript, das leere Volumes beim ersten Start automatisch mit den Startinhalten befüllt.
+Das Projekt bringt alles für den Betrieb in Docker mit: `Dockerfile`, `docker-compose.yaml`, einen Healthcheck (`/health.php`) und ein Startskript, das leere Volumes beim ersten Start automatisch mit den Startinhalten befüllt. Caddy läuft davor als Reverse Proxy und kümmert sich um HTTPS.
 
 Im Container liegen Inhalte, Passwort, Sicherungen und Anmeldungen in `/var/www/data`, also **außerhalb** des Web-Verzeichnisses. Sie sind damit grundsätzlich nicht über den Browser abrufbar. Die Sperren für `inc/` und `uploads/` stehen fest in der Apache-Konfiguration des Images (`docker/apache.conf`).
 
-**1. Code in ein Git-Repository legen**
+**Voraussetzungen auf dem Server**
+- Docker mit dem Compose-Plugin (`docker compose version` muss funktionieren)
+- Caddy (z. B. als Systemdienst aus dem offiziellen Paket)
+- Ports 80 und 443 in der Firewall offen
+- Die Domain zeigt per DNS (A-Eintrag) auf die IP-Adresse des Servers. Bei einer Gemeinde-Domain (`.gv.at`) muss das die Stelle einrichten, die die Domain der Gemeinde verwaltet.
+
+**1. Code auf den Server holen**
 
 ```bash
-cd kindergarten-schweiggers
-git init && git add . && git commit -m "Website Kindergarten Schweiggers"
-git remote add origin <URL Ihres Repositorys>
-git push -u origin main
+git clone https://github.com/breichr/kiga-schweiggers.git /opt/kiga
+cd /opt/kiga
 ```
 
+Bei einem privaten Repository vorher einen Deploy-Key (nur Lesezugriff) in GitHub hinterlegen und über die SSH-Adresse klonen.
 Die mitgelieferte `.gitignore` sorgt dafür, dass Passwort, Sicherungen und Fotos nie ins Repository gelangen.
-Für ein privates Repository in Coolify vorher die GitHub-App oder einen Deploy-Key einrichten.
 
-**2. In Coolify anlegen**
+**2. Port nur für Caddy freigeben**
 
-Projekt → *New Resource* → *Private/Public Repository* → Repository wählen.
-Danach **eine** der beiden Varianten wählen:
+Die `docker-compose.yaml` öffnet keinen Port nach außen. Daneben die Datei `/opt/kiga/docker-compose.override.yml` anlegen (sie bleibt nur auf dem Server und wird von Docker Compose automatisch mitgelesen):
 
-*A) Build Pack „Docker Compose“ (am einfachsten)*
-- Coolify liest `docker-compose.yaml` und legt die beiden Volumes `kiga-data` und `kiga-uploads` automatisch an.
-- Coolify schlägt über `SERVICE_FQDN_WEB_80` automatisch eine Domain vor. Beim Dienst **web** die eigene Domain eintragen, z. B. `https://kindergarten.schweiggers.gv.at`.
+```yaml
+services:
+  web:
+    ports:
+      - "127.0.0.1:8080:80"   # nur lokal erreichbar, nicht aus dem Internet
+```
 
-*B) Build Pack „Dockerfile“*
-- *Ports Exposes*: `80`
-- Unter *Persistent Storage* zwei Volumes anlegen:
-  - Ziel `/var/www/data`
-  - Ziel `/var/www/html/uploads`
-- Domain eintragen.
+**3. Starten**
 
-**3. Deployen und einrichten**
+```bash
+docker compose up -d --build
+docker compose ps                          # Status sollte „healthy“ zeigen
+curl -I http://127.0.0.1:8080/health.php   # sollte „200 OK“ liefern
+```
 
-- *Deploy* klicken. Nach dem Start sollte der Status „healthy“ sein.
-- `https://<Ihre Domain>/admin` aufrufen und das Passwort festlegen.
+Docker legt dabei die beiden Volumes `kiga_kiga-data` und `kiga_kiga-uploads` an (der Teil vor dem Unterstrich ist der Ordnername `kiga`).
+
+**4. Caddy einrichten**
+
+In `/etc/caddy/Caddyfile` (Domain anpassen):
+
+```caddy
+kindergarten.schweiggers.gv.at {
+    encode zstd gzip
+    reverse_proxy 127.0.0.1:8080
+}
+```
+
+```bash
+sudo systemctl reload caddy
+```
+
+Caddy holt das HTTPS-Zertifikat automatisch und leitet `http://` auf `https://` um. Die Website erkennt HTTPS hinter dem Proxy (über den Header `X-Forwarded-Proto`) und setzt das Anmelde-Cookie entsprechend sicher. Die echte Besucher-IP kommt ebenfalls an.
+
+*Falls Caddy selbst in einem Docker-Container läuft:* Schritt 2 weglassen, beide Container in ein gemeinsames Docker-Netzwerk hängen und im Caddyfile `reverse_proxy web:80` statt `127.0.0.1:8080` eintragen.
+
+**5. Einrichten**
+
+- `https://<Ihre Domain>/admin` aufrufen und das Passwort festlegen (mindestens 10 Zeichen).
 - Kontrolle: `https://<Ihre Domain>/inc/functions.php` muss „Forbidden“ zeigen.
 
-**Wichtig zu den Volumes**
-- Ohne Volumes gehen bei jedem neuen Deploy alle Änderungen und Fotos verloren.
-- Neue Deploys (z. B. nach Änderungen am Design) lassen Inhalte, Fotos, Passwort und Anmeldungen unangetastet. Diese liegen ausschließlich in den Volumes.
-- Die Datei `data/content.json` im Repository ist nur die Vorlage für den allerersten Start.
+**Updates einspielen**
 
-**HTTPS**
-Coolify stellt das Zertifikat über seinen Proxy automatisch aus. Die Website erkennt HTTPS hinter dem Proxy und setzt das Anmelde-Cookie entsprechend sicher.
-Die Domain muss per DNS (A-Eintrag) auf die IP-Adresse des Servers zeigen. Bei einer Gemeinde-Domain (`.gv.at`) muss das die Stelle einrichten, die die Domain der Gemeinde verwaltet.
-
-**Sicherung der Volumes**
-Coolify sichert automatisch nur Datenbanken, keine Volumes. Die Inhalte deshalb zusätzlich regelmäßig sichern, z. B. per Cronjob auf dem Server:
+Nach Änderungen am Code (z. B. am Design):
 
 ```bash
-docker run --rm -v <volume-name-data>:/d -v <volume-name-uploads>:/u -v /root/kiga-backup:/b alpine \
-  tar czf /b/kiga-$(date +%F).tar.gz -C / d u
+cd /opt/kiga
+git pull
+docker compose up -d --build
 ```
 
-Die genauen Volume-Namen zeigt `docker volume ls` (Coolify stellt eine Kennung voran).
+**Wichtig zu den Volumes**
+- Inhalte, Fotos, Passwort und Anmeldungen liegen ausschließlich in den Volumes. Ein Update lässt sie unangetastet.
+- **Niemals** `docker compose down -v` ausführen: Das `-v` löscht die Volumes und damit alle Inhalte.
+- Die Datei `data/content.json` im Repository ist nur die Vorlage für den allerersten Start.
 
-**Passwort zurücksetzen in Coolify**
-1. Unter *Environment Variables* `KIGA_RESET_PASSWORD` auf `1` setzen und neu starten (*Restart*).
-2. `/admin` aufrufen und ein neues Passwort festlegen.
-3. `KIGA_RESET_PASSWORD` wieder auf `0` setzen, sonst wird das Passwort bei jedem Neustart erneut gelöscht.
+**Sicherung der Volumes**
+Die Inhalte regelmäßig sichern, z. B. täglich per Cronjob auf dem Server (`crontab -e`):
 
-Alternativ im Terminal des Containers: `rm /var/www/data/config.php`
+```bash
+30 3 * * * docker run --rm -v kiga_kiga-data:/d -v kiga_kiga-uploads:/u -v /root/kiga-backup:/b alpine tar czf /b/kiga-$(date +\%F).tar.gz -C / d u
+```
+
+Die Sicherungsdateien zusätzlich vom Server wegkopieren (z. B. auf einen anderen Rechner oder Speicherplatz).
+
+Wiederherstellen einer Sicherung:
+
+```bash
+cd /opt/kiga && docker compose stop
+docker run --rm -v kiga_kiga-data:/d -v kiga_kiga-uploads:/u -v /root/kiga-backup:/b alpine \
+  tar xzf /b/kiga-JJJJ-MM-TT.tar.gz -C /
+docker compose start
+```
+
+**Passwort zurücksetzen**
+
+```bash
+cd /opt/kiga
+docker compose exec web rm -f /var/www/data/config.php /var/www/data/.login-versuche
+```
+
+Danach `/admin` aufrufen und ein neues Passwort festlegen. Die Inhalte bleiben erhalten.
+
+*Hinweis:* Das Image läuft genauso in Coolify oder anderen Docker-Plattformen (Build Pack „Docker Compose“, Domain beim Dienst `web` auf Port 80).
 
 ### Umzug von der alten Joomla-Seite
 
@@ -189,13 +234,13 @@ Alternativ im Terminal des Containers: `rm /var/www/data/config.php`
 
 ### Passwort zurücksetzen
 
-Die Datei `data/config.php` per FTP löschen (bei Coolify: siehe oben).
+Die Datei `data/config.php` per FTP löschen (beim eigenen Server: siehe Variante 3).
 Beim nächsten Aufruf von `/admin` kann ein neues Passwort festgelegt werden. Die Inhalte bleiben erhalten.
 
 ### Datensicherung
 
 Alle Inhalte stecken in zwei Ordnern:
-- `data/` – Texte, Einstellungen, automatische Sicherungen (bei Coolify: Volume unter `/var/www/data`)
+- `data/` – Texte, Einstellungen, automatische Sicherungen (bei Docker: Volume unter `/var/www/data`)
 - `uploads/` – Fotos
 
 Diese beiden Ordner regelmäßig zusätzlich extern sichern.
@@ -204,9 +249,9 @@ Diese beiden Ordner regelmäßig zusätzlich extern sichern.
 
 ```
 index.php          Öffentliche Website
-health.php         Statusprüfung für Coolify/Docker
+health.php         Statusprüfung für Docker
 Dockerfile         Image-Bauplan
-docker-compose.yaml  Für Coolify (Build Pack „Docker Compose“)
+docker-compose.yaml  Startet den Container (docker compose)
 docker/            Startskript, Apache- und PHP-Einstellungen für den Container
 admin/             Verwaltung (Anmeldung, Bearbeiten, Foto-Upload)
 inc/functions.php  Gemeinsame Funktionen und Aufbau der Bereiche

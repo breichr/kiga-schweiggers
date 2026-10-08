@@ -2,7 +2,7 @@
 
 Kleine, datenbankfreie PHP-Website mit eigener Verwaltung (`/admin`).
 
-- Hosting auf Coolify: siehe [ANLEITUNG.md](ANLEITUNG.md), „Variante 3: Coolify“
+- Hosting auf eigenem Server mit Docker und Caddy: siehe [ANLEITUNG.md](ANLEITUNG.md), „Variante 3“
 - Inhalte bearbeiten: siehe [ANLEITUNG.md](ANLEITUNG.md), Teil A
 
 Lokal testen:
